@@ -1,4 +1,4 @@
-package com.jemersoft.pokechallenge.model.response;
+package com.jemersoft.pokechallenge.model.response.ApiResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PokemonListResponse {
-    String imageUrl;
-    String type;
+public class ApiPokemonResponse {
+    Object sprites;
+    List<Object> type;
     double weight;
-    private List<String> abilities;
+    private List<Object> abilities;
 }

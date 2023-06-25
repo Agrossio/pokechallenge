@@ -1,17 +1,15 @@
-package com.jemersoft.pokechallenge.model.response;
+package com.jemersoft.pokechallenge.model.response.myResponse;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PokemonResponse {
+public class MyPokemonResponse extends MyPokemonListResponse {
     private String basicInfo;
     private String description;
     private List<String> moves;
