@@ -13,13 +13,13 @@ public class Pokemon {
 
     @Id
     @Column(name = "name", length = 255, nullable = false, unique = true)
-    String name;
+    private String name;
     @Column(name = "image_url")
-    String imageUrl;
+    private String imageUrl;
     @ManyToMany
-    List<Type> types;
+    private List<Type> types;
     @Column(name = "weight", precision = 2)
-    double weight;
+    private double weight;
     @ManyToMany
     private List<Ability> abilities;
     @Column(name = "description")

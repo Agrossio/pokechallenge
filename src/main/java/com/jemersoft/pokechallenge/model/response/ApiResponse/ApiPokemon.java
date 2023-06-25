@@ -1,21 +1,21 @@
-package com.jemersoft.pokechallenge.model.response.myResponse;
+package com.jemersoft.pokechallenge.model.response.ApiResponse;
 
 import com.jemersoft.pokechallenge.model.entity.Ability;
 import com.jemersoft.pokechallenge.model.entity.Move;
 import com.jemersoft.pokechallenge.model.entity.Type;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-public class MyPokemonListResponse {
+public class ApiPokemon {
     private String name;
     private String imageUrl;
-    private List<Type> type;
+    private List<Type> types;
     private double weight;
     private List<Ability> abilities;
+    private String description;
+    private List<Move> moves;
 
 }

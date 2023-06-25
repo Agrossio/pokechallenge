@@ -13,5 +13,5 @@ public class Ability {
     private Integer ailityId;
 
     @Column (name = "ability_name")
-    String abilityName;
+    private String abilityName;
 }

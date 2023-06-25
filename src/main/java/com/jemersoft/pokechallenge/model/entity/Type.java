@@ -1,6 +1,7 @@
 package com.jemersoft.pokechallenge.model.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
 
 @Entity
@@ -13,5 +14,5 @@ public class Type {
     private Integer typeId;
 
     @Column (name = "type_name")
-    String typeName;
+    private String typeName;
 }

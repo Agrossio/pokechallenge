@@ -15,5 +15,5 @@ public class ApiPokemonListResponse {
     private Integer count;
     private String next;
     private String previous;
-    private List<Object> results;
+    private List<ApiPokemonResults> results;
 }

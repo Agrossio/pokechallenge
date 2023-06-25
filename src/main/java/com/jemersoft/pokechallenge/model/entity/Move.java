@@ -13,5 +13,5 @@ public class Move {
     private Integer moveId;
 
     @Column (name = "move_name")
-    String moveName;
+    private String moveName;
 }
