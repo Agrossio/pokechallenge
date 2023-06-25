@@ -1,5 +1,8 @@
 package com.jemersoft.pokechallenge.model.response.myResponse;
 
+import com.jemersoft.pokechallenge.model.entity.Ability;
+import com.jemersoft.pokechallenge.model.entity.Move;
+import com.jemersoft.pokechallenge.model.entity.Type;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +17,8 @@ import java.util.List;
 public class MyPokemonListResponse {
     String name;
     Object sprites;
-    List<Object> type;
+    List<Type> type;
     double weight;
-    private List<Object> abilities;
+    private List<Ability> abilities;
 
 }
