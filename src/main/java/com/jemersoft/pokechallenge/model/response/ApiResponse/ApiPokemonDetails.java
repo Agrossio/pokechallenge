@@ -1,11 +1,10 @@
 package com.jemersoft.pokechallenge.model.response.ApiResponse;
 
-import com.jemersoft.pokechallenge.model.entity.Ability;
-import com.jemersoft.pokechallenge.model.entity.Move;
-import com.jemersoft.pokechallenge.model.entity.Type;
 import com.jemersoft.pokechallenge.model.util.ability.ApiAbility;
+import com.jemersoft.pokechallenge.model.util.description.ApiFlavorTextEntry;
 import com.jemersoft.pokechallenge.model.util.image.ApiSprite;
 
+import com.jemersoft.pokechallenge.model.util.move.ApiMove;
 import com.jemersoft.pokechallenge.model.util.type.ApiType;
 import lombok.*;
 
@@ -22,6 +21,7 @@ public class ApiPokemonDetails {
     private List<ApiType> types;
     private double weight;
     private List<ApiAbility> abilities;
-    private List<Move> moves;
+    private List<ApiMove> moves;
+    private List<ApiFlavorTextEntry> flavor_text_entries;
 
 }

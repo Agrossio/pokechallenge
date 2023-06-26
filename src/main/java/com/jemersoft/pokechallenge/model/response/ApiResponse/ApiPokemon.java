@@ -25,7 +25,7 @@ public class ApiPokemon {
     private List<String> abilities;
 
 // Pokemon Details:
-    private String description;
-    private List<Move> moves;
+    private List<String> description;
+    private List<String> moves;
 
 }

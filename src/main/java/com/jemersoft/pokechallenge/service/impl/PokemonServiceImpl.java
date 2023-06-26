@@ -55,47 +55,93 @@ public class PokemonServiceImpl implements PokemonService {
         apiPokemonResults.stream()
                 .forEach(pokemonNameUrl -> {
 
-            ApiPokemonDetails apiPokemonDetails = httpClient.exchange(pokemonNameUrl.getUrl(), HttpMethod.GET, null, ApiPokemonDetails.class).getBody();
+                    ApiPokemon apiPokemon = detailsHttpRequest(pokemonNameUrl.getName(), false);
 
-            System.out.println("DETAILS " + apiPokemonDetails);
-
-            ApiPokemon apiPokemon = new ApiPokemon();
-
-            // Name
-            apiPokemon.setName(apiPokemonDetails.getName());
-            // Photo
-            apiPokemon.setImageUrl(apiPokemonDetails.getSprites().getOther().getDream_world().getFront_default());
-
-            // Types
-            List<String> typeNames = apiPokemonDetails.getTypes().stream()
-                    .map(apiType -> apiType.getType().get("name"))
-                    .collect(Collectors.toList());
-
-            apiPokemon.setTypes(typeNames);
-
-            // Weight
-            apiPokemon.setWeight(apiPokemonDetails.getWeight());
-
-            // Abilities
-            List<String> abilitiesNames = apiPokemonDetails.getAbilities().stream()
-                    .map(apiAbility -> apiAbility.getAbility().get("name"))
-                    .collect(Collectors.toList());
-
-            apiPokemon.setAbilities(abilitiesNames);
-
-            apiPokemonList.add(apiPokemon);
-        });
+                    apiPokemonList.add(apiPokemon);
+                });
 
 
-        System.out.println("LISTA" + apiPokemonList);
-//        System.out.println(apiPokemonResults);
-//        System.out.println(apiPokemonListResponse);
+        System.out.println("LISTA " + apiPokemonList);
 
          return MyPokemonListResponse.toResponse(apiPokemonList);
     }
 
+
+
     @Override
     public MyPokemonResponse getDetails(String name) {
+        ApiPokemon apiPokemonDetails = detailsHttpRequest(name, true);
+
+        //List<String> apiPokemonDescription = getDescriptionHttp(name);
+
+        //apiPokemonDetails.setDescription(apiPokemonDescription);
+
+        System.out.println("CONTROLLER DETALLE " + apiPokemonDetails);
         return null;
     }
+
+    public List<String> getDescriptionHttp(String pokemonName){
+        String detailsUrl = "https://pokeapi.co/api/v2/pokemon-species/" + pokemonName;
+
+        ResponseEntity<ApiPokemonDetails> apiPokemonDetailsResponse = Optional.of(httpClient.exchange(detailsUrl, HttpMethod.GET, null, ApiPokemonDetails.class)).orElseThrow();
+
+        ApiPokemonDetails apiPokemonDetails = Optional.of(apiPokemonDetailsResponse.getBody()).orElseThrow();
+
+
+         List<String> descriptions = apiPokemonDetails.getFlavor_text_entries().stream()
+                 .map(apiFlavorTextEntry -> apiFlavorTextEntry.getDescription().get("flavor_text"))
+                 .collect(Collectors.toList());
+
+
+        return descriptions;
+
+    }
+
+    public ApiPokemon detailsHttpRequest(String pokemonName, boolean getMoves){
+
+        String detailsUrl = "https://pokeapi.co/api/v2/pokemon/" + pokemonName;
+
+        ResponseEntity<ApiPokemonDetails> apiPokemonDetailsResponse = Optional.of(httpClient.exchange(detailsUrl, HttpMethod.GET, null, ApiPokemonDetails.class)).orElseThrow();
+
+        ApiPokemonDetails apiPokemonDetails = Optional.of(apiPokemonDetailsResponse.getBody()).orElseThrow();
+
+        // System.out.println("DETAILS " + apiPokemonDetails);
+
+        ApiPokemon apiPokemon = new ApiPokemon();
+
+        // Name
+        apiPokemon.setName(apiPokemonDetails.getName());
+
+        // Photo
+        apiPokemon.setImageUrl(apiPokemonDetails.getSprites().getOther().getDream_world().getFront_default());
+
+        // Types
+        List<String> typeNames = apiPokemonDetails.getTypes().stream()
+                .map(apiType -> apiType.getType().get("name"))
+                .collect(Collectors.toList());
+
+        apiPokemon.setTypes(typeNames);
+
+        // Weight
+        apiPokemon.setWeight(apiPokemonDetails.getWeight());
+
+        // Abilities
+        List<String> abilitiesNames = apiPokemonDetails.getAbilities().stream()
+                .map(apiAbility -> apiAbility.getAbility().get("name"))
+                .collect(Collectors.toList());
+
+        apiPokemon.setAbilities(abilitiesNames);
+
+        // Moves
+        if (getMoves == true) {
+            List<String> movesNames = apiPokemonDetails.getMoves().stream()
+                    .map(apiMove -> apiMove.getMove().get("name"))
+                    .collect(Collectors.toList());
+
+            apiPokemon.setMoves(movesNames);
+        }
+
+        return apiPokemon;
+    }
+
 }
