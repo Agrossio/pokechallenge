@@ -3,12 +3,11 @@ package com.jemersoft.pokechallenge.model.response.ApiResponse;
 import com.jemersoft.pokechallenge.model.entity.Ability;
 import com.jemersoft.pokechallenge.model.entity.Move;
 import com.jemersoft.pokechallenge.model.entity.Type;
-import com.jemersoft.pokechallenge.model.response.ApiResponse.image.ApiSprite;
+import com.jemersoft.pokechallenge.model.util.ability.ApiAbility;
+import com.jemersoft.pokechallenge.model.util.image.ApiSprite;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.jemersoft.pokechallenge.model.util.type.ApiType;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,11 +15,13 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class ApiPokemonDetails {
+    private String name;
     private ApiSprite sprites;
-    private List<Type> types;
+    private List<ApiType> types;
     private double weight;
-    private List<Ability> abilities;
+    private List<ApiAbility> abilities;
     private List<Move> moves;
 
 }
