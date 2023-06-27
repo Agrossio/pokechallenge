@@ -11,7 +11,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-//@ToString(callSuper = true)
+@ToString(callSuper = true)
 public class MyPokemonResponse extends MyPokemonListResponse {
     private List<String> descriptions;
     private List<String> moves;

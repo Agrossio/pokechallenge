@@ -15,7 +15,7 @@ public class ApiDescription {
     private Map<String, String> languageDetails;
 
     @JsonGetter("language")
-    public String getLanguage(){
+    public String getLanguageName(){
       return this.languageDetails.get("name");
    }
 

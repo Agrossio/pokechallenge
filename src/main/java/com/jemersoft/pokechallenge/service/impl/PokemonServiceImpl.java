@@ -1,31 +1,19 @@
 package com.jemersoft.pokechallenge.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.jemersoft.pokechallenge.model.entity.Pokemon;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemon;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonDetails;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonResults;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonResponse;
-import com.jemersoft.pokechallenge.model.util.description.ApiDescription;
-import com.jemersoft.pokechallenge.model.util.type.ApiType;
 import com.jemersoft.pokechallenge.service.abs.PokemonService;
 import lombok.Data;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,13 +22,15 @@ import java.util.stream.Collectors;
 @Data
 public class PokemonServiceImpl implements PokemonService {
 
-    private String requestUrl = "https://pokeapi.co/api/v2/pokemon?offset=0&limit=20";
+
     private RestTemplate httpClient = new RestTemplate();
 
     @Override
-    public List<MyPokemonListResponse> findAll() {
+    public List<MyPokemonListResponse> findAll(String offset, String limit) {
 
-        Optional<ResponseEntity<ApiPokemonListResponse>> apiPokemonListResponse = Optional.of(httpClient.exchange(this.requestUrl, HttpMethod.GET, null, ApiPokemonListResponse.class));
+        String requestUrl = "https://pokeapi.co/api/v2/pokemon?offset=" + offset + "&limit=" + limit;
+
+        Optional<ResponseEntity<ApiPokemonListResponse>> apiPokemonListResponse = Optional.of(httpClient.exchange(requestUrl, HttpMethod.GET, null, ApiPokemonListResponse.class));
 
         apiPokemonListResponse.orElseThrow();
 
@@ -77,8 +67,6 @@ public class PokemonServiceImpl implements PokemonService {
 
         apiPokemonDetails.setDescriptions(apiPokemonDescriptionNames);
 
-        System.out.println("SERVICIO ----> " + apiPokemonDetails);
-
         return MyPokemonResponse.toResponse(apiPokemonDetails);
     }
 
@@ -90,7 +78,7 @@ public class PokemonServiceImpl implements PokemonService {
         ApiPokemonDetails apiPokemonDescription = Optional.of(apiPokemonDescriptionResponse.getBody()).orElseThrow();
 
         List<String> apiFilteredDescriptionNames = apiPokemonDescription.getDescriptions().stream()
-                .filter(apiDescription -> apiDescription.getLanguage().equals(language))
+                .filter(apiDescription -> apiDescription.getLanguageName().equals(language))
                 .map(apiDescription -> apiDescription.getDescriptionText())
                 .toList();
 
