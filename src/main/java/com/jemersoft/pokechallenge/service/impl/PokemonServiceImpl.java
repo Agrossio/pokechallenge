@@ -9,6 +9,7 @@ import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonResults;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonResponse;
+import com.jemersoft.pokechallenge.model.util.description.ApiDescription;
 import com.jemersoft.pokechallenge.model.util.type.ApiType;
 import com.jemersoft.pokechallenge.service.abs.PokemonService;
 import lombok.Data;
@@ -69,31 +70,31 @@ public class PokemonServiceImpl implements PokemonService {
 
 
     @Override
-    public MyPokemonResponse getDetails(String name) {
+    public MyPokemonResponse getDetails(String name, String language) {
         ApiPokemon apiPokemonDetails = detailsHttpRequest(name, true);
 
-        //List<String> apiPokemonDescription = getDescriptionHttp(name);
+        List<String> apiPokemonDescriptionNames = getDescriptionHttp(name, language);
 
-        //apiPokemonDetails.setDescription(apiPokemonDescription);
+        apiPokemonDetails.setDescriptions(apiPokemonDescriptionNames);
 
-        System.out.println("CONTROLLER DETALLE " + apiPokemonDetails);
-        return null;
+        System.out.println("SERVICIO ----> " + apiPokemonDetails);
+
+        return MyPokemonResponse.toResponse(apiPokemonDetails);
     }
 
-    public List<String> getDescriptionHttp(String pokemonName){
-        String detailsUrl = "https://pokeapi.co/api/v2/pokemon-species/" + pokemonName;
+    public List<String> getDescriptionHttp(String pokemonName, String language){
+        String descriptionUrl = "https://pokeapi.co/api/v2/pokemon-species/" + pokemonName;
 
-        ResponseEntity<ApiPokemonDetails> apiPokemonDetailsResponse = Optional.of(httpClient.exchange(detailsUrl, HttpMethod.GET, null, ApiPokemonDetails.class)).orElseThrow();
+        ResponseEntity<ApiPokemonDetails> apiPokemonDescriptionResponse = Optional.of(httpClient.exchange(descriptionUrl, HttpMethod.GET, null, ApiPokemonDetails.class)).orElseThrow();
 
-        ApiPokemonDetails apiPokemonDetails = Optional.of(apiPokemonDetailsResponse.getBody()).orElseThrow();
+        ApiPokemonDetails apiPokemonDescription = Optional.of(apiPokemonDescriptionResponse.getBody()).orElseThrow();
 
+        List<String> apiFilteredDescriptionNames = apiPokemonDescription.getDescriptions().stream()
+                .filter(apiDescription -> apiDescription.getLanguage().equals(language))
+                .map(apiDescription -> apiDescription.getDescriptionText())
+                .toList();
 
-         List<String> descriptions = apiPokemonDetails.getFlavor_text_entries().stream()
-                 .map(apiFlavorTextEntry -> apiFlavorTextEntry.getDescription().get("flavor_text"))
-                 .collect(Collectors.toList());
-
-
-        return descriptions;
+        return apiFilteredDescriptionNames;
 
     }
 

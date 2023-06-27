@@ -25,10 +25,12 @@ public class PokemonController {
         return pokemonListResponse;
     };
 
-    @GetMapping("/{name}")
-    public MyPokemonResponse findById(@PathVariable String name){
+    @GetMapping("/{name}/{language}")
+    public MyPokemonResponse findById(@PathVariable String name, @PathVariable String language){
 
-        MyPokemonResponse pokemonResponse = pokeService.getDetails(name);
+        MyPokemonResponse pokemonResponse = pokeService.getDetails(name, language);
+
+        // System.out.println("DETALLE CONTROLLER " + pokemonResponse);
 
         return pokemonResponse;
     };

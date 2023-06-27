@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface PokemonService {
     List<MyPokemonListResponse> findAll();
-    MyPokemonResponse getDetails(String name);
+    MyPokemonResponse getDetails(String name, String language);
 }
