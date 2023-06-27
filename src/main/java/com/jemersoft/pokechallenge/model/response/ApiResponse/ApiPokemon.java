@@ -1,10 +1,5 @@
 package com.jemersoft.pokechallenge.model.response.ApiResponse;
 
-import com.jemersoft.pokechallenge.model.entity.Ability;
-import com.jemersoft.pokechallenge.model.entity.Move;
-import com.jemersoft.pokechallenge.model.entity.Type;
-
-import com.jemersoft.pokechallenge.model.util.type.ApiType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +20,7 @@ public class ApiPokemon {
     private List<String> abilities;
 
 // Pokemon Details:
-    private String description;
-    private List<Move> moves;
+    private List<String> descriptions;
+    private List<String> moves;
 
 }

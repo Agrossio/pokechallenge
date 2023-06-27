@@ -1,16 +1,15 @@
 package com.jemersoft.pokechallenge.model.response.myResponse;
 
-import com.jemersoft.pokechallenge.model.entity.Ability;
-import com.jemersoft.pokechallenge.model.entity.Move;
-import com.jemersoft.pokechallenge.model.entity.Type;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemon;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Builder con herencia: https://www.baeldung.com/lombok-builder-inheritance
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class MyPokemonListResponse {

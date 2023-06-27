@@ -6,6 +6,6 @@ import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonResponse;
 import java.util.List;
 
 public interface PokemonService {
-    List<MyPokemonListResponse> findAll();
-    MyPokemonResponse getDetails(String name);
+    List<MyPokemonListResponse> findAll(String offset, String limit);
+    MyPokemonResponse getDetails(String name, String language);
 }
