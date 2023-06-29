@@ -1,63 +1,71 @@
 package com.jemersoft.pokechallenge.service.impl;
 
+import com.jemersoft.pokechallenge.exception.customExceptions.BadRequestException;
+import com.jemersoft.pokechallenge.exception.customExceptions.NotFoundException;
+import com.jemersoft.pokechallenge.exception.customExceptions.PokeApiConnectionException;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemon;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonDetails;
 import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonResults;
-import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonListResponse;
+import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonListResponseBody;
 import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonResponse;
 import com.jemersoft.pokechallenge.service.abs.PokemonService;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Data
+@RequiredArgsConstructor
+@Slf4j
 public class PokemonServiceImpl implements PokemonService {
 
-
-    private RestTemplate httpClient = new RestTemplate();
+    private static final String BASE_URL = "https://pokeapi.co/api/v2";
+    private final RestTemplate httpClient = new RestTemplate();
 
     @Override
-    public List<MyPokemonListResponse> findAll(String offset, String limit) {
+    public List<MyPokemonListResponse> findAll(String offset, String limit) throws BadRequestException {
 
-        String requestUrl = "https://pokeapi.co/api/v2/pokemon?offset=" + offset + "&limit=" + limit;
+        String requestUrl = BASE_URL + "/pokemon?offset=" + offset + "&limit=" + limit;
 
-        Optional<ResponseEntity<ApiPokemonListResponse>> apiPokemonListResponse = Optional.of(httpClient.exchange(requestUrl, HttpMethod.GET, null, ApiPokemonListResponse.class));
+        try {
+            ResponseEntity<ApiPokemonListResponseBody> apiPokemonListResponse = httpClient.exchange(requestUrl, HttpMethod.GET, null, ApiPokemonListResponseBody.class);
 
-        apiPokemonListResponse.orElseThrow();
+            ApiPokemonListResponseBody apiPokemonListBody = apiPokemonListResponse.getBody();
 
+            List<ApiPokemonResults> apiPokemonResults = apiPokemonListBody.getResults();
 
-        Optional<ApiPokemonListResponse> apiPokemonListBody = Optional.of(apiPokemonListResponse.get().getBody());
+            List<ApiPokemon> apiPokemonList = new ArrayList<>();
 
-        apiPokemonListBody.orElseThrow();
+            apiPokemonResults
+                    .forEach(pokemonNameUrl -> {
 
-        List<ApiPokemonResults> apiPokemonResults = apiPokemonListBody.get().getResults();
+                        ApiPokemon apiPokemon = detailsHttpRequest(pokemonNameUrl.getName(), false);
 
-        List<ApiPokemon> apiPokemonList = new ArrayList<>();
+                        apiPokemonList.add(apiPokemon);
+                    });
 
-        apiPokemonResults.stream()
-                .forEach(pokemonNameUrl -> {
+            log.info("LISTA " + apiPokemonList);
 
-                    ApiPokemon apiPokemon = detailsHttpRequest(pokemonNameUrl.getName(), false);
+             return MyPokemonListResponse.toResponse(apiPokemonList);
 
-                    apiPokemonList.add(apiPokemon);
-                });
+        } catch (HttpClientErrorException.BadRequest e) {
+            throw new BadRequestException("Bad Request", e);
+        }  catch (HttpServerErrorException e) {
+            throw new PokeApiConnectionException("PokeApi connection error: " + e.getMessage(), e);
+        }
 
-
-        System.out.println("LISTA " + apiPokemonList);
-
-         return MyPokemonListResponse.toResponse(apiPokemonList);
     }
-
-
 
     @Override
     public MyPokemonResponse getDetails(String name, String language) {
@@ -70,67 +78,85 @@ public class PokemonServiceImpl implements PokemonService {
         return MyPokemonResponse.toResponse(apiPokemonDetails);
     }
 
-    public List<String> getDescriptionHttp(String pokemonName, String language){
-        String descriptionUrl = "https://pokeapi.co/api/v2/pokemon-species/" + pokemonName;
+    public List<String> getDescriptionHttp(String pokemonName, String language) throws NotFoundException, BadRequestException, PokeApiConnectionException {
+        String descriptionUrl = BASE_URL + "/pokemon-species/" + pokemonName;
 
-        ResponseEntity<ApiPokemonDetails> apiPokemonDescriptionResponse = Optional.of(httpClient.exchange(descriptionUrl, HttpMethod.GET, null, ApiPokemonDetails.class)).orElseThrow();
+        try {
 
-        ApiPokemonDetails apiPokemonDescription = Optional.of(apiPokemonDescriptionResponse.getBody()).orElseThrow();
+            ResponseEntity<ApiPokemonDetails> apiPokemonDescriptionResponse = httpClient.exchange(descriptionUrl, HttpMethod.GET, null, ApiPokemonDetails.class);
 
-        List<String> apiFilteredDescriptionNames = apiPokemonDescription.getDescriptions().stream()
-                .filter(apiDescription -> apiDescription.getLanguageName().equals(language))
-                .map(apiDescription -> apiDescription.getDescriptionText())
-                .toList();
+            Optional<ApiPokemonDetails> apiPokemonDescription = Optional.ofNullable(apiPokemonDescriptionResponse.getBody());
 
-        return apiFilteredDescriptionNames;
+            return apiPokemonDescription.orElseThrow(()-> new NullPointerException("Response Body is null")).getDescriptions().stream()
+                    .filter(apiDescription -> apiDescription.getLanguageName().equals(language))
+                    .map(apiDescription -> apiDescription.getDescriptionText())
+                    .toList();
+
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new NotFoundException("Pokemon Not Found", e);
+        } catch (HttpClientErrorException.BadRequest e) {
+            throw new BadRequestException("Bad Request", e);
+        } catch (HttpServerErrorException e) {
+            throw new PokeApiConnectionException("PokeApi connection error: " + e.getMessage(), e);
+        }
+
 
     }
 
-    public ApiPokemon detailsHttpRequest(String pokemonName, boolean getMoves){
+    public ApiPokemon detailsHttpRequest(String pokemonName, boolean getMoves) throws NotFoundException, BadRequestException, PokeApiConnectionException {
 
-        String detailsUrl = "https://pokeapi.co/api/v2/pokemon/" + pokemonName;
+        String detailsUrl = BASE_URL + "/pokemon/" + pokemonName;
 
-        ResponseEntity<ApiPokemonDetails> apiPokemonDetailsResponse = Optional.of(httpClient.exchange(detailsUrl, HttpMethod.GET, null, ApiPokemonDetails.class)).orElseThrow();
+        try {
 
-        ApiPokemonDetails apiPokemonDetails = Optional.of(apiPokemonDetailsResponse.getBody()).orElseThrow();
+        ResponseEntity<ApiPokemonDetails> apiPokemonDetailsResponse = httpClient.exchange(detailsUrl, HttpMethod.GET, null, ApiPokemonDetails.class);
 
-        // System.out.println("DETAILS " + apiPokemonDetails);
+            ApiPokemonDetails apiPokemonDetails = apiPokemonDetailsResponse.getBody();
 
-        ApiPokemon apiPokemon = new ApiPokemon();
+            ApiPokemon apiPokemon = new ApiPokemon();
 
-        // Name
-        apiPokemon.setName(apiPokemonDetails.getName());
+            // Name
+            apiPokemon.setName(apiPokemonDetails.getName());
 
-        // Photo
-        apiPokemon.setImageUrl(apiPokemonDetails.getSprites().getOther().getDream_world().getFront_default());
+            // Photo
+            apiPokemon.setImageUrl(apiPokemonDetails.getSprites().getOther().getDream_world().getFront_default());
 
-        // Types
-        List<String> typeNames = apiPokemonDetails.getTypes().stream()
-                .map(apiType -> apiType.getType().get("name"))
-                .collect(Collectors.toList());
+            // Types
+            List<String> typeNames = apiPokemonDetails.getTypes().stream()
+                    .map(apiType -> apiType.getType().get("name"))
+                    .toList();
 
-        apiPokemon.setTypes(typeNames);
+            apiPokemon.setTypes(typeNames);
 
-        // Weight
-        apiPokemon.setWeight(apiPokemonDetails.getWeight());
+            // Weight
+            apiPokemon.setWeight(apiPokemonDetails.getWeight());
 
-        // Abilities
-        List<String> abilitiesNames = apiPokemonDetails.getAbilities().stream()
-                .map(apiAbility -> apiAbility.getAbility().get("name"))
-                .collect(Collectors.toList());
+            // Abilities
+            List<String> abilitiesNames = apiPokemonDetails.getAbilities().stream()
+                    .map(apiAbility -> apiAbility.getAbility().get("name"))
+                    .toList();
 
-        apiPokemon.setAbilities(abilitiesNames);
+            apiPokemon.setAbilities(abilitiesNames);
 
-        // Moves
-        if (getMoves == true) {
-            List<String> movesNames = apiPokemonDetails.getMoves().stream()
-                    .map(apiMove -> apiMove.getMove().get("name"))
-                    .collect(Collectors.toList());
+            // Moves
+            if (getMoves) {
+                List<String> movesNames = apiPokemonDetails.getMoves().stream()
+                        .map(apiMove -> apiMove.getMove().get("name"))
+                        .toList();
 
-            apiPokemon.setMoves(movesNames);
+                apiPokemon.setMoves(movesNames);
+            }
+
+            return apiPokemon;
+
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new NotFoundException("Pokemon Not Found", e);
+        } catch (HttpClientErrorException.BadRequest e) {
+            throw new BadRequestException("Bad Request", e);
+        } catch (HttpServerErrorException e) {
+            throw new PokeApiConnectionException("PokeApi connection error: " + e.getMessage(), e);
         }
 
-        return apiPokemon;
     }
 
 }

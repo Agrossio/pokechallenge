@@ -1,8 +1,8 @@
 package com.jemersoft.pokechallenge.model.util.image;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class ApiDreamWorldSprite {
     private String front_default;
 }

@@ -1,7 +1,8 @@
 package com.jemersoft.pokechallenge.model.util.image;
 
-import lombok.Data;
-@Data
+import lombok.Getter;
+
+@Getter
 public class ApiSprite {
   private ApiOtherSprite other;
 

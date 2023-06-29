@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiPokemonListResponse {
+public class ApiPokemonListResponseBody {
     private Integer count;
     private String next;
     private String previous;

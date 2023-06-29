@@ -2,11 +2,11 @@ package com.jemersoft.pokechallenge.model.util.description;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.Map;
 
-@Data
+@Getter
 public class ApiDescription {
     @JsonProperty("flavor_text")
     private String descriptionText;
