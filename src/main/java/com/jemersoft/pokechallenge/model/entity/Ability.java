@@ -10,7 +10,7 @@ public class Ability {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ability_id")
-    private Integer ailityId;
+    private Integer abilityId;
 
     @Column (name = "ability_name")
     private String abilityName;

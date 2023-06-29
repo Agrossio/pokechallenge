@@ -1,4 +1,4 @@
-package com.jemersoft.pokechallenge.model.response.ApiResponse;
+package com.jemersoft.pokechallenge.model.response.apiresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jemersoft.pokechallenge.model.util.ability.ApiAbility;

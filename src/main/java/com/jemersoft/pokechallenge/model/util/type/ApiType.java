@@ -10,9 +10,4 @@ public class ApiType {
    @JsonProperty("type")
    private Map<String, String> type;
 
-//   @JsonGetter("type")
-//   public String getName(){
-//      return this.type.get("name");
-//   }
-
 }

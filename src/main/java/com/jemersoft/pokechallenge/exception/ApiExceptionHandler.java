@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 @ControllerAdvice
 @Slf4j
 public class ApiExceptionHandler {
-    private static final String BASE_MSG = " Error Calling: ";
+    private static final String BASE_MSG = ". Error Calling: ";
     // 400 - Bad Request Error:
     @ExceptionHandler({
             BadRequestException.class
@@ -24,7 +24,7 @@ public class ApiExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(Exception e, HandlerMethod method){
-        log.info(e.getMessage() + BASE_MSG + method.getBeanType().getSimpleName() + "." + method.getMethod().getName() + "().");
+        log.warn(e.getMessage() + BASE_MSG + method.getBeanType().getSimpleName() + "." + method.getMethod().getName() + "().");
 
         return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
     }
@@ -36,8 +36,7 @@ public class ApiExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(Exception e, HandlerMethod method){
-        log.info(e.getMessage() + BASE_MSG + method.getBeanType().getSimpleName() + "." + method.getMethod().getName() + "().");
-
+        log.warn(e.getMessage() + BASE_MSG + method.getBeanType().getSimpleName() + "." + method.getMethod().getName() + "().");
         return new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
@@ -50,7 +49,6 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ErrorResponse handlePokeApiConnectionException(Exception e, HandlerMethod method){
         log.error(e.getMessage() + BASE_MSG + method.getBeanType().getSimpleName() + "." + method.getMethod().getName() + "().");
-
         return new ErrorResponse("Connection Error", HttpStatus.SERVICE_UNAVAILABLE.value());
     }
 

@@ -2,22 +2,22 @@ package com.jemersoft.pokechallenge.service.impl;
 
 import com.jemersoft.pokechallenge.exception.customExceptions.BadRequestException;
 import com.jemersoft.pokechallenge.exception.customExceptions.NotFoundException;
-import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemon;
-import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonDetails;
-import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonResults;
-import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemonListResponseBody;
-import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonListResponse;
-import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonResponse;
+import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemon;
+import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemonDetails;
+import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemonResults;
+import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemonListResponseBody;
+import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonListResponse;
+import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonResponse;
 import com.jemersoft.pokechallenge.service.abs.PokemonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,11 @@ import java.util.Optional;
 @Slf4j
 public class PokemonServiceImpl implements PokemonService {
 
+//    @Value("${pokeapi.base-url}")
+//    private final String BASE_URL;
     private static final String BASE_URL = "https://pokeapi.co/api/v2";
+    private static final String BAD_REQUEST = "Bad Request";
+    private static final String POKE_NOT_FOUND = "Pokemon Not Found";
     private final RestTemplate httpClient = new RestTemplate();
 
     @Override
@@ -41,30 +45,27 @@ public class PokemonServiceImpl implements PokemonService {
 
             List<ApiPokemonResults> apiPokemonResults = apiPokemonListBody.getResults();
 
-            List<ApiPokemon> apiPokemonList = new ArrayList<>();
-
-            apiPokemonResults
-                    .forEach(pokemonNameUrl -> {
-
-                        ApiPokemon apiPokemon = detailsHttpRequest(pokemonNameUrl.getName(), false);
-
-                        apiPokemonList.add(apiPokemon);
-                    });
+            List<ApiPokemon> apiPokemonList =  apiPokemonResults
+                    .stream().map(pokemonNameUrl -> detailsHttpRequest(pokemonNameUrl.getName(), false))
+                    .toList();
 
              return MyPokemonListResponse.toResponse(apiPokemonList);
 
         } catch (HttpClientErrorException.BadRequest e) {
-            throw new BadRequestException("Bad Request", e);
+            throw new BadRequestException(BAD_REQUEST, e);
         }
 
     }
 
     @Override
     public MyPokemonResponse getDetails(String name, String language) {
+        // Fetch Pokemon details:
         ApiPokemon apiPokemonDetails = detailsHttpRequest(name, true);
 
+        // Fetch Pokemon descriptions:
         List<String> apiPokemonDescriptionNames = getDescriptionHttp(name, language);
 
+        // Add descriptions to Pokémon details:
         apiPokemonDetails.setDescriptions(apiPokemonDescriptionNames);
 
         return MyPokemonResponse.toResponse(apiPokemonDetails);
@@ -77,9 +78,9 @@ public class PokemonServiceImpl implements PokemonService {
 
             ResponseEntity<ApiPokemonDetails> apiPokemonDescriptionResponse = httpClient.exchange(descriptionUrl, HttpMethod.GET, null, ApiPokemonDetails.class);
 
-            Optional<ApiPokemonDetails> apiPokemonDescription = Optional.ofNullable(apiPokemonDescriptionResponse.getBody());
+            ApiPokemonDetails apiPokemonDescription = Optional.ofNullable(apiPokemonDescriptionResponse.getBody()).orElseThrow(()-> new NullPointerException("Response Body is null"));
 
-            return apiPokemonDescription.orElseThrow(()-> new NullPointerException("Response Body is null")).getDescriptions().stream()
+            return apiPokemonDescription.getDescriptions().stream()
                     .filter(apiDescription -> apiDescription.getLanguageName().equals(language))
                     .map(apiDescription -> {
                         String description = apiDescription.getDescriptionText();
@@ -88,9 +89,9 @@ public class PokemonServiceImpl implements PokemonService {
                     .toList();
 
         } catch (HttpClientErrorException.NotFound e) {
-            throw new NotFoundException("Pokemon Not Found", e);
+            throw new NotFoundException(POKE_NOT_FOUND, e);
         } catch (HttpClientErrorException.BadRequest e) {
-            throw new BadRequestException("Bad Request", e);
+            throw new BadRequestException(BAD_REQUEST, e);
         }
     }
 
@@ -102,12 +103,15 @@ public class PokemonServiceImpl implements PokemonService {
 
         ResponseEntity<ApiPokemonDetails> apiPokemonDetailsResponse = httpClient.exchange(detailsUrl, HttpMethod.GET, null, ApiPokemonDetails.class);
 
-            ApiPokemonDetails apiPokemonDetails = apiPokemonDetailsResponse.getBody();
+            ApiPokemonDetails apiPokemonDetails = Optional.ofNullable(apiPokemonDetailsResponse.getBody()).orElseThrow(()-> new NullPointerException("Response Body is null"));
 
             ApiPokemon apiPokemon = new ApiPokemon();
 
             // Name
             apiPokemon.setName(apiPokemonDetails.getName());
+
+            // Weight
+            apiPokemon.setWeight(apiPokemonDetails.getWeight());
 
             // Photo
             apiPokemon.setImageUrl(apiPokemonDetails.getSprites().getOther().getDream_world().getFront_default());
@@ -116,17 +120,12 @@ public class PokemonServiceImpl implements PokemonService {
             List<String> typeNames = apiPokemonDetails.getTypes().stream()
                     .map(apiType -> apiType.getType().get("name"))
                     .toList();
-
             apiPokemon.setTypes(typeNames);
-
-            // Weight
-            apiPokemon.setWeight(apiPokemonDetails.getWeight());
 
             // Abilities
             List<String> abilitiesNames = apiPokemonDetails.getAbilities().stream()
                     .map(apiAbility -> apiAbility.getAbility().get("name"))
                     .toList();
-
             apiPokemon.setAbilities(abilitiesNames);
 
             // Moves
@@ -134,18 +133,16 @@ public class PokemonServiceImpl implements PokemonService {
                 List<String> movesNames = apiPokemonDetails.getMoves().stream()
                         .map(apiMove -> apiMove.getMove().get("name"))
                         .toList();
-
                 apiPokemon.setMoves(movesNames);
             }
 
             return apiPokemon;
 
         } catch (HttpClientErrorException.NotFound e) {
-            throw new NotFoundException("Pokemon Not Found", e);
+            throw new NotFoundException(POKE_NOT_FOUND, e);
         } catch (HttpClientErrorException.BadRequest e) {
-            throw new BadRequestException("Bad Request", e);
+            throw new BadRequestException(BAD_REQUEST, e);
         }
-
     }
 
 }

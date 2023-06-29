@@ -1,4 +1,4 @@
-package com.jemersoft.pokechallenge.model.response.ApiResponse;
+package com.jemersoft.pokechallenge.model.response.apiresponse;
 
 import lombok.Data;
 
