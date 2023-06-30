@@ -1,7 +1,7 @@
 package com.jemersoft.pokechallenge.service.abs;
 
-import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonListResponse;
-import com.jemersoft.pokechallenge.model.response.myResponse.MyPokemonResponse;
+import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonListResponse;
+import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonResponse;
 
 import java.util.List;
 

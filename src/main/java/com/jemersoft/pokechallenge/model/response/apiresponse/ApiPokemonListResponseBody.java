@@ -1,4 +1,4 @@
-package com.jemersoft.pokechallenge.model.response.ApiResponse;
+package com.jemersoft.pokechallenge.model.response.apiresponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiPokemonListResponse {
+public class ApiPokemonListResponseBody {
     private Integer count;
     private String next;
     private String previous;

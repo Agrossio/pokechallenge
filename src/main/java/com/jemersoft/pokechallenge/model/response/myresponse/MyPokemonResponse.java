@@ -1,12 +1,13 @@
-package com.jemersoft.pokechallenge.model.response.myResponse;
+package com.jemersoft.pokechallenge.model.response.myresponse;
 
-import com.jemersoft.pokechallenge.model.response.ApiResponse.ApiPokemon;
+import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemon;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 // Builder con herencia: https://www.baeldung.com/lombok-builder-inheritance
+@EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
 @NoArgsConstructor
