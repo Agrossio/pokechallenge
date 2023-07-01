@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/pokemon")
+@RequestMapping("/pokemon")
 @RequiredArgsConstructor
 @Tag(name = "Pokemon Controller", description = "Allowed actions to get Pokemon info")
 public class PokemonController {
