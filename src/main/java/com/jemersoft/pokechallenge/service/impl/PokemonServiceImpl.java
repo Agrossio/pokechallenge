@@ -9,7 +9,9 @@ import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemonResults;
 import com.jemersoft.pokechallenge.model.response.apiresponse.ApiPokemonListResponseBody;
 import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonResponse;
+import com.jemersoft.pokechallenge.model.response.myresponse.MyPagedResponse;
 import com.jemersoft.pokechallenge.service.abs.PokemonService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +37,32 @@ public class PokemonServiceImpl implements PokemonService {
     private final RestTemplate httpClient = new RestTemplate();
 
     @Override
-    public List<MyPokemonListResponse> findAll(String offset, String limit) throws BadRequestException {
+    public MyPagedResponse findAll(Integer offset, Integer limit, boolean cached) throws BadRequestException {
+
+        try {
+
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            final String HOST_URL = requestAttributes.getRequest().getRequestURI().toString();
+
+            String nextUrl = HOST_URL + "?offset=" + (offset+limit) + "&maxResults=" + limit + "&cached=true";
+            String prevUrl = (offset-limit) >= 0 ? HOST_URL + "?offset=" + (offset-limit) + "&maxResults=" + limit + "&cached=true" : null;
+
+            List<Integer> queryParameters = List.of(offset, limit);
+
+            if (cached && Cache.getQueryParametersList() != null && Cache.getQueryParametersList().equals(queryParameters)){
+
+                return MyPagedResponse.builder()
+                        .cached(true)
+                        .results(Cache.getCachedListResponse())
+                        .next(nextUrl)
+                        .previous(prevUrl)
+                        .count(Cache.getCachedListResponse().size())
+                        .build();
+            }
 
         String requestUrl = BASE_URL + "/pokemon?offset=" + offset + "&limit=" + limit;
 
-        try {
+
 
             ResponseEntity<ApiPokemonListResponseBody> apiPokemonListResponse = httpClient.exchange(requestUrl, HttpMethod.GET, null, ApiPokemonListResponseBody.class);
 
@@ -51,9 +76,16 @@ public class PokemonServiceImpl implements PokemonService {
 
             List<MyPokemonListResponse> myPokemonListResponseList = MyPokemonListResponse.toResponse(apiPokemonList);
 
+            Cache.setQueryParametersList(queryParameters);
             Cache.setCachedListResponse(myPokemonListResponseList);
 
-            return myPokemonListResponseList;
+            return MyPagedResponse.builder()
+                    .next(nextUrl)
+                    .previous(prevUrl)
+                    .count(myPokemonListResponseList.size())
+                    .results(myPokemonListResponseList)
+                    .cached(false)
+                    .build();
 
         } catch (HttpClientErrorException.BadRequest e) {
             throw new BadRequestException(BAD_REQUEST, e);
@@ -62,7 +94,14 @@ public class PokemonServiceImpl implements PokemonService {
     }
 
     @Override
-    public MyPokemonResponse getDetails(String name, String language) {
+    public MyPokemonResponse getDetails(String name, String language, boolean cached) {
+
+        List<String> queryParameters = List.of(name, language);
+
+        if (cached && Cache.getQueryParameters() != null && Cache.getQueryParameters().equals(queryParameters)){
+            return Cache.getCachedResponse();
+        }
+
         // Fetch Pokemon details:
         ApiPokemon apiPokemonDetails = detailsHttpRequest(name, true);
 
@@ -74,6 +113,7 @@ public class PokemonServiceImpl implements PokemonService {
 
         MyPokemonResponse myPokemonResponse = MyPokemonResponse.toResponse(apiPokemonDetails);
 
+        Cache.setQueryParameters(queryParameters);
         Cache.setCachedResponse(myPokemonResponse);
 
         return myPokemonResponse;

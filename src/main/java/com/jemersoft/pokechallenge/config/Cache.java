@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Cache {
     private static List<MyPokemonListResponse> cachedListResponse;
-    private static List<String> queryParametersList;
+    private static List<Integer> queryParametersList;
     private static MyPokemonResponse cachedResponse;
     private static List<String> queryParameters;
 
@@ -20,11 +20,11 @@ public class Cache {
         Cache.cachedListResponse = cachedListResponse;
     }
 
-    public static List<String> getQueryParametersList() {
+    public static List<Integer> getQueryParametersList() {
         return queryParametersList;
     }
 
-    public static void setQueryParametersList(List<String> queryParametersList) {
+    public static void setQueryParametersList(List<Integer> queryParametersList) {
         Cache.queryParametersList = queryParametersList;
     }
 

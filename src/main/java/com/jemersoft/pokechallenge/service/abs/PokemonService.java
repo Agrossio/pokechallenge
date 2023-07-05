@@ -1,11 +1,9 @@
 package com.jemersoft.pokechallenge.service.abs;
 
-import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonResponse;
-
-import java.util.List;
+import com.jemersoft.pokechallenge.model.response.myresponse.MyPagedResponse;
 
 public interface PokemonService {
-    List<MyPokemonListResponse> findAll(String offset, String limit);
-    MyPokemonResponse getDetails(String name, String language);
+    MyPagedResponse findAll(Integer offset, Integer limit, boolean cached);
+    MyPokemonResponse getDetails(String name, String language, boolean cached);
 }
