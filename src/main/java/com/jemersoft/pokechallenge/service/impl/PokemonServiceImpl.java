@@ -41,8 +41,10 @@ public class PokemonServiceImpl implements PokemonService {
 
         try {
 
-            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            final String HOST_URL = requestAttributes.getRequest().getRequestURI().toString();
+            // To get the Host Url:
+            ServletRequestAttributes requestAttributes = Optional.ofNullable((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).orElseThrow(()-> new NullPointerException("Request is null"));
+
+            final String HOST_URL = requestAttributes.getRequest().getRequestURI();
 
             String nextUrl = HOST_URL + "?offset=" + (offset+limit) + "&maxResults=" + limit + "&cached=true";
             String prevUrl = (offset-limit) >= 0 ? HOST_URL + "?offset=" + (offset-limit) + "&maxResults=" + limit + "&cached=true" : null;
@@ -61,8 +63,6 @@ public class PokemonServiceImpl implements PokemonService {
             }
 
         String requestUrl = BASE_URL + "/pokemon?offset=" + offset + "&limit=" + limit;
-
-
 
             ResponseEntity<ApiPokemonListResponseBody> apiPokemonListResponse = httpClient.exchange(requestUrl, HttpMethod.GET, null, ApiPokemonListResponseBody.class);
 
