@@ -5,5 +5,5 @@ import com.jemersoft.pokechallenge.model.response.myresponse.MyPagedResponse;
 
 public interface PokemonService {
     MyPagedResponse findAll(Integer offset, Integer limit, boolean cached);
-    MyPokemonResponse getDetails(String name, String language, boolean cached);
+    MyPagedResponse getDetails(String name, String language, boolean cached);
 }

@@ -29,7 +29,7 @@ public class PokemonController {
     @Operation(summary = "Get Pokemon Details", description = "This endpoint gets the details of a given Pokemon name or id. You can optionally specify a desired language with 'language' query param. It should be the two-letter code of the country where this language is spoken. To avoid getting cached results you can add 'cached=false' option (Default values are: language=es and cached=true)")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public MyPokemonResponse findById(@PathVariable String name, @RequestParam(required = false, defaultValue = "es") String language, @RequestParam(required = false, defaultValue = "true") boolean cached){
+    public MyPagedResponse findById(@PathVariable String name, @RequestParam(required = false, defaultValue = "es") String language, @RequestParam(required = false, defaultValue = "true") boolean cached){
         return pokeService.getDetails(name, language, cached);
     }
 

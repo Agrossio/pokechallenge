@@ -2,15 +2,14 @@ package com.jemersoft.pokechallenge.config;
 
 import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonListResponse;
 import com.jemersoft.pokechallenge.model.response.myresponse.MyPokemonResponse;
-import lombok.Data;
 
 import java.util.List;
 
 public class Cache {
     private static List<MyPokemonListResponse> cachedListResponse;
-    private static List<Integer> queryParametersList;
+    private static List<Integer> integerQueryParameters;
     private static MyPokemonResponse cachedResponse;
-    private static List<String> queryParameters;
+    private static List<String> stringQueryParameters;
 
     public static List<MyPokemonListResponse> getCachedListResponse() {
         return cachedListResponse;
@@ -20,12 +19,12 @@ public class Cache {
         Cache.cachedListResponse = cachedListResponse;
     }
 
-    public static List<Integer> getQueryParametersList() {
-        return queryParametersList;
+    public static List<Integer> getIntegerQueryParameters() {
+        return integerQueryParameters;
     }
 
-    public static void setQueryParametersList(List<Integer> queryParametersList) {
-        Cache.queryParametersList = queryParametersList;
+    public static void setIntegerQueryParameters(List<Integer> integerQueryParameters) {
+        Cache.integerQueryParameters = integerQueryParameters;
     }
 
     public static MyPokemonResponse getCachedResponse() {
@@ -36,11 +35,11 @@ public class Cache {
         Cache.cachedResponse = cachedResponse;
     }
 
-    public static List<String> getQueryParameters() {
-        return queryParameters;
+    public static List<String> getStringQueryParameters() {
+        return stringQueryParameters;
     }
 
-    public static void setQueryParameters(List<String> queryParameters) {
-        Cache.queryParameters = queryParameters;
+    public static void setStringQueryParameters(List<String> stringQueryParameters) {
+        Cache.stringQueryParameters = stringQueryParameters;
     }
 }

@@ -51,7 +51,7 @@ public class PokemonServiceImpl implements PokemonService {
 
             List<Integer> queryParameters = List.of(offset, limit);
 
-            if (cached && Cache.getQueryParametersList() != null && Cache.getQueryParametersList().equals(queryParameters)){
+            if (cached && Cache.getIntegerQueryParameters() != null && Cache.getIntegerQueryParameters().equals(queryParameters)){
 
                 return MyPagedResponse.builder()
                         .cached(true)
@@ -76,7 +76,7 @@ public class PokemonServiceImpl implements PokemonService {
 
             List<MyPokemonListResponse> myPokemonListResponseList = MyPokemonListResponse.toResponse(apiPokemonList);
 
-            Cache.setQueryParametersList(queryParameters);
+            Cache.setIntegerQueryParameters(queryParameters);
             Cache.setCachedListResponse(myPokemonListResponseList);
 
             return MyPagedResponse.builder()
@@ -94,12 +94,18 @@ public class PokemonServiceImpl implements PokemonService {
     }
 
     @Override
-    public MyPokemonResponse getDetails(String name, String language, boolean cached) {
+    public MyPagedResponse getDetails(String name, String language, boolean cached) {
 
         List<String> queryParameters = List.of(name, language);
 
-        if (cached && Cache.getQueryParameters() != null && Cache.getQueryParameters().equals(queryParameters)){
-            return Cache.getCachedResponse();
+        if (cached && Cache.getStringQueryParameters() != null && Cache.getStringQueryParameters().equals(queryParameters)){
+            return MyPagedResponse.builder()
+                    .next(null)
+                    .previous(null)
+                    .count(null)
+                    .results(Cache.getCachedResponse())
+                    .cached(true)
+                    .build();
         }
 
         // Fetch Pokemon details:
@@ -113,10 +119,16 @@ public class PokemonServiceImpl implements PokemonService {
 
         MyPokemonResponse myPokemonResponse = MyPokemonResponse.toResponse(apiPokemonDetails);
 
-        Cache.setQueryParameters(queryParameters);
+        Cache.setStringQueryParameters(queryParameters);
         Cache.setCachedResponse(myPokemonResponse);
 
-        return myPokemonResponse;
+        return MyPagedResponse.builder()
+                .next(null)
+                .previous(null)
+                .count(null)
+                .results(myPokemonResponse)
+                .cached(false)
+                .build();
 
     }
 
@@ -127,9 +139,9 @@ public class PokemonServiceImpl implements PokemonService {
 
             ResponseEntity<ApiPokemonDetails> apiPokemonDescriptionResponse = httpClient.exchange(descriptionUrl, HttpMethod.GET, null, ApiPokemonDetails.class);
 
-            ApiPokemonDetails apiPokemonDescription = Optional.ofNullable(apiPokemonDescriptionResponse.getBody()).orElseThrow(()-> new NullPointerException("Response Body is null"));
+            ApiPokemonDetails apiPokemonDescriptions = Optional.ofNullable(apiPokemonDescriptionResponse.getBody()).orElseThrow(()-> new NullPointerException("Response Body is null"));
 
-            return apiPokemonDescription.getDescriptions().stream()
+            return apiPokemonDescriptions.getDescriptions().stream()
                     .filter(apiDescription -> apiDescription.getLanguageName().equals(language))
                     .map(apiDescription -> {
                         String description = apiDescription.getDescriptionText();
