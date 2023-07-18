@@ -19,13 +19,13 @@ public class SpringFoxSwaggerConfig {
                         .title("PokeChallenge Springboot API")
                         .version("V1")
                         .description("""
-                                Challenge técnico para posición de Software Engineer en XX SA. Se busca evaluar:
-                                        - Integrar una API externa.
-                                        - Exponer un API usando Java Spring Boot.
-                                        - Implementar Swagger o consumir API desde front-end
-                                        - Desplegar en la nube.
-                                        - Manejar errores.
-                                        - Mantener un código ordenado y de calidad.
+                               Challenge for a Software Engineer position. We look forward to evaluate:
+                                - External API integration.
+                                - Expose an API using Java Spring Boot.
+                                - Implement Swagger.
+                                - Deploy to the cloud.
+                                - Exception handling.
+                                - Clean and quality code.
                                 """)
                         .contact(new Contact().name("Matias Abossio").url("https://www.matiabossio.com.ar/").email("abossio@gmail.com"))
                         .termsOfService("https://swagger.io/terms/")
