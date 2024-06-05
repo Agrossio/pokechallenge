@@ -1,34 +1,35 @@
 # PokeChallenge Springboot API
 
-Esta aplicación Backend desarrollada en Springboot 3 fue desarrollada en el contexto de un challenge para una entrevista de Software Engineer.<br/>
-[Ver deploy](https://pokechallenge.matiabossio.com.ar/api/v1/doc/swagger-ui/index.html)
+This Backend application developed in Spring Boot 3 was created in the context of a challenge for a Software Engineer interview.<br/>
+[See deploy](https://pokechallenge.matiabossio.com.ar/api/v1/doc/swagger-ui/index.html)
 
-## Instrucciones
-Para el back-end se pide construir una API REST usando Java Spring Boot o Node Js que exponga la información al Pokedex.
+## Instructions
 
-Esta API debe consumir el servicio externo PokeApi https://pokeapi.co/ para obtener la información. La documentación la puedes encontrar en https://pokeapi.co/docs/v2.
+For the backend, I was asked to build a REST API using Java Spring Boot or Node.js to expose information to the Pokédex.
 
-Se deben exponer los endpoints necesarios para poder montar un frontend (no es parte del entregable) que es una página donde se listan los pokémons inicialmente mostrando la siguiente información (información básica):
-* Foto (url)
-* Tipo (type)
-* Peso (weight)
-* Listado de Habilidades (ability)
+This API was supposed to consume the external service PokeApi https://pokeapi.co/ to obtain the information. The documentation can be found at https://pokeapi.co/docs/v2.
 
-Cuando el usuario haga click en alguno de los pokemons, se muestra una pantalla con más detalles del pokemon seleccionado:
-* Información Básica (devuelta en la lista de pokemons)
-* Descripción (en español)
-* Lista de Movimientos (campo name en moves)
+The necessary endpoints had to be exposed in order to set up a frontend (which is not part of the deliverable), which was a page listing the pokémons initially showing the following information (Basic Information):
+* Photo (url)
+* Type
+* Weight
+* Abilities List
 
-* Debes incluir Swagger en tu API para poder probar los endpoints. Pero si deseas (opcional) puedes hacer un front-end que haga las llamadas mencionadas arriba, y puedes elegir el lenguaje de tu preferencia.
+When the user clicked on any of the pokemons, a screen with more details of the selected pokemon had to be shown:
+* Basic Information (returned in the list of pokemons)
+* Description
+* List of Moves (name field in moves)
+* Swagger had to be included in the API to test the endpoints
+* Optionally, I could choose to add different languages
 
-La aplicación debe ser desplegada en AWS, Azure, GCP o Heroku, a elección. El código de la aplicación debe estar alojado en algún repositorio Git al que debes darnos acceso.
+The application had to be deployed on AWS, Azure, GCP, or Heroku, of choice. The application code had to be hosted in a Git repository.
 
-Cualquier funcionalidad extra u optimización es bienvenida.
+Any extra functionality or optimization was welcome: I added the option to get a Cached List for the List of Pokemons endpoint in order save time, resources and external API consumption. 🚀
 
-Lo que evaluaremos con este desafío, es que seas capaz de:
-* Integrar una API externa.
-* Exponer un API usando Java Spring Boot.
-* Implementar Swagger o consumir API desde front-end
-* Desplegar en la nube.
-* Manejar errores.
-* Mantener un código ordenado y de calidad.
+With this challenge, they evaluated me to see if I was able to:
+* Integrate an external API.
+* Expose an API using Java Spring Boot.
+* Implement Swagger.
+* Deploy in the cloud.
+* Handle errors.
+* Maintain an ordered and quality code.
